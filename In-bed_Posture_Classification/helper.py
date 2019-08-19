@@ -1,3 +1,20 @@
+# Data Load
+import os
+import numpy as np
+
+# PyTorch (modeling)
+import torch
+from torch import nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torch.utils.data.sampler import SubsetRandomSampler
+from torchvision import transforms
+import torchvision.transforms.functional as TF
+
+# Visualization
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 # These functions are introduced along the Part 1 notebook.
 
 # Position vectors. We load the data with respect to the file name, which is
@@ -156,3 +173,84 @@ def load_exp_ii(path):
           labels = None
 
     return exp_ii_data_air, exp_ii_data_spo
+
+### Leave-one-subject-out Cross Validation (used on Part 2)
+
+def exp_i_cv():
+  subjects_i = ["S1", "S2", "S3", "S4", "S5", "S6", "S7",
+                "S8", "S9", "S10", "S11", "S12", "S13"]
+
+  print("Performing one-subject-out cross validation on 'Experiment I':")
+
+  torch.manual_seed(123)
+
+  accuracies = []
+
+  for subject in subjects_i:
+    remaining_subjects = subjects_i.copy()
+    remaining_subjects.remove(subject)
+
+    trainset_exp_i = Mat_Dataset(["Base"], remaining_subjects)
+    valset_exp_i = Mat_Dataset(["Base"], [subject])
+
+    trainloader = DataLoader(trainset_exp_i, batch_size=64, shuffle=True)
+    testloader = DataLoader(valset_exp_i, batch_size=64, shuffle=False)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    model = CNN()
+
+    criterion = nn.NLLLoss()
+
+    optimizer = optim.Adam(model.parameters(), lr = 0.001)
+
+    model.to(device)
+
+    epochs = 15
+    running_loss = 0
+
+    train_losses, test_losses = [], []
+
+    for epoch in range(epochs):
+      for inputs, labels in trainloader:
+
+        inputs, labels = inputs.to(device), labels.to(device)
+
+        optimizer.zero_grad()
+
+        logps = model.forward(inputs)
+        loss = criterion(logps, labels)
+        loss.backward()
+        optimizer.step()
+
+        running_loss += loss.item()
+
+      else:
+
+        test_loss = 0
+        accuracy = 0
+        model.eval()
+
+        with torch.no_grad():
+          for inputs, labels in testloader:
+            inputs, labels = inputs.to(device), labels.to(device)
+            logps = model.forward(inputs)
+            test_loss += criterion(logps, labels)
+
+            ps = torch.exp(logps)
+            top_p, top_class = ps.topk(1, dim=1)
+            equals = top_class == labels.view(*top_class.shape)
+            accuracy += torch.mean(equals.type(torch.FloatTensor))
+
+        train_losses.append(running_loss/len(trainloader))
+        test_losses.append(test_loss/len(testloader))
+
+        accuracy = accuracy/len(testloader)
+        if (epoch + 1) == epochs:
+          print(f"Leave out: {subject} - "
+                f"Test accuracy: {accuracy:.3f}")
+        running_loss = 0
+        model.train()
+
+    accuracies.append(accuracy)
+  print(f"Results, one-subject-out cross validation: accuracy: {np.mean(accuracies)}")
