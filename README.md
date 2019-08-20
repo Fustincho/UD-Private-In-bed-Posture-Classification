@@ -1,4 +1,4 @@
-# Project: In-bed Posture Classification on a Pressure Map Dataset
+# Project: Private In-bed Posture Classification on a Pressure Map Dataset
 
 ## Authors (`@Slack_IDs`, `GitHub_Username`):
 
