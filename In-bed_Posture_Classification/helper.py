@@ -14,7 +14,6 @@ from torch.utils.data import Dataset
 from torch.utils.data import random_split
 from torch.utils.data import DataLoader
 
-
 # Visualization
 import matplotlib.pyplot as plt
 
