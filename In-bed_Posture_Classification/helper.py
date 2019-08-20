@@ -10,10 +10,13 @@ import torch.optim as optim
 from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import transforms
 import torchvision.transforms.functional as TF
+from torch.utils.data import Dataset
+from torch.utils.data import random_split
+from torch.utils.data import DataLoader
+
 
 # Visualization
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 # These functions are introduced along the Part 1 notebook.
 
@@ -35,6 +38,8 @@ positions_ii = {
     "E6":"left", "F":"supine", "G1":"supine",
     "G2":"right", "G3":"left"
 }
+
+class_positions = ['supine', 'left', 'right', 'left_fetus', 'right_fetus']
 
 # We also want the classes to be encoded as numbers so we can work easier when
 # modeling. This function achieves so. Since left_fetus and right_fetus are not
@@ -206,7 +211,7 @@ def exp_i_cv():
 
     model.to(device)
 
-    epochs = 15
+    epochs = 5
     running_loss = 0
 
     train_losses, test_losses = [], []
@@ -254,3 +259,139 @@ def exp_i_cv():
 
     accuracies.append(accuracy)
   print(f"Results, one-subject-out cross validation: accuracy: {np.mean(accuracies)}")
+
+def train_all_exp_i():
+  subjects_i = ["S1", "S2", "S3", "S4", "S5", "S6", "S7",
+                "S8", "S9", "S10", "S11", "S12", "S13"]
+
+  torch.manual_seed(123)
+
+  trainset_exp_i = Mat_Dataset(["Base"], subjects_i)
+
+  trainloader = DataLoader(trainset_exp_i, batch_size=64, shuffle=True)
+
+  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+  model = CNN()
+
+  criterion = nn.NLLLoss()
+
+  optimizer = optim.Adam(model.parameters(), lr = 0.001)
+
+  model.to(device)
+
+  epochs = 5
+  running_loss = 0
+
+  train_losses = []
+
+  for epoch in range(epochs):
+    for inputs, labels in trainloader:
+
+      inputs, labels = inputs.to(device), labels.to(device)
+
+      optimizer.zero_grad()
+
+      logps = model.forward(inputs)
+      loss = criterion(logps, labels)
+      loss.backward()
+      optimizer.step()
+
+      running_loss += loss.item()
+      train_losses.append(running_loss/len(trainloader))
+      if (epoch + 1) == epochs:
+        print(f"Leave out: {subject} - "
+              f"Test accuracy: {accuracy:.3f}")
+      running_loss = 0
+      model.train()
+
+      return model, train_losses
+
+# Custom class introduced on Part 2
+
+class Mat_Dataset(Dataset):
+  def __init__(self, mats, Subject_IDs):
+
+    self.samples = []
+    self.labels = []
+
+    for mat in mats:
+      data = datasets[mat]
+      self.samples.append(np.vstack([data.get(key)[0] for key in Subject_IDs]))
+      self.labels.append(np.hstack([data.get(key)[1] for key in Subject_IDs]))
+
+    self.samples = np.vstack(self.samples)
+    self.labels = np.hstack(self.labels)
+
+  def __len__(self):
+    return self.samples.shape[0]
+
+  def __getitem__(self, idx):
+    return self.samples[idx], self.labels[idx]
+
+# CNN model introduced in Part 2
+
+class CNN(nn.Module):
+
+  def __init__(self):
+    super().__init__()
+
+    ## Convolutional Layers
+    #Input channels = 1, output channels = 6
+    self.conv1 = torch.nn.Conv2d(1, 6, kernel_size=3, stride=1, padding=1)
+    #Input channels = 6, output channels = 18
+    self.conv2 = torch.nn.Conv2d(6, 18, kernel_size=3, stride=1, padding=1)
+
+    ## Pool Layer
+    self.pool = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
+
+    ## Mulit-Layer Perceptron
+    # Hidden layers
+    self.h1 = nn.Linear(18 * 16 * 8, 392)
+    self.h2 = nn.Linear(392, 98)
+
+    # Output layer, 3 neurons - one for each position
+    self.output = nn.Linear(98, 3)
+
+    # ReLU activation and softmax output
+    self.relu = nn.ReLU()
+    self.logsoftmax = nn.LogSoftmax(dim=1)
+
+  def forward(self, x):
+
+    x = x.float()
+    # Add a "channel dimension"
+    x = x.unsqueeze(1)
+
+    ## Computation on convolutional and pool layers:
+    # Size changes from (1, 64, 32) to (6, 64, 32)
+    x = F.relu(self.conv1(x))
+    # Size changes from (6, 64, 32) to (6, 32, 16)
+    x = self.pool(x)
+    # Size changes from (6, 32, 16) to (18, 32, 16)
+    x = F.relu(self.conv2(x))
+    # Size changes from (18, 32, 16) to (18, 16, 8)
+    x = self.pool(x)
+
+    # Reshape data to input to the input layer of the MLP
+    # Size changes from (18, 16, 8) to (1, 2304)
+    x = x.view(x.shape[0], -1)
+
+    ## Computation on the MLP layers:
+    x = self.h1(x)
+    x = self.relu(x)
+    x = self.h2(x)
+    x = self.relu(x)
+    x = self.output(x)
+    x = self.logsoftmax(x)
+
+    return x
+
+exp_i_data = load_exp_i("dataset/experiment-i")
+exp_ii_data_air, exp_ii_data_spo = load_exp_ii("dataset/experiment-ii")
+
+datasets = {
+    "Base":exp_i_data,
+    "Spo":exp_ii_data_air,
+    "Air":exp_ii_data_spo
+}
