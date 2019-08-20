@@ -1,10 +1,10 @@
-# Project: Private In-bed Posture Classification on a Pressure Map Dataset
+# Private In-bed Posture Classification on a Pressure Map Dataset
 
 ## Authors (`@Slack_IDs`, `GitHub_Username`):
 
 + Agustín Vargas Toro (`@Fustincho`, [Fustincho](https://github.com/Fustincho))
-+ Luis Antonio Aguilar Gutiérrez (`@Antonio`, [LsAntonio](https://github.com/LsAntonio))
 + Alejandro Aristizábal Medina (`@Alejandro Aristizábal`, [aristizabal95](https://github.com/aristizabal95))
++ Luis Antonio Aguilar Gutiérrez (`@Antonio`, [LsAntonio](https://github.com/LsAntonio))
 
 ## Motivation
 
