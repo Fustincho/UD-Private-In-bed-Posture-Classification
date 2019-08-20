@@ -8,21 +8,21 @@
 
 ## Motivation
 
-This short project serves as a demonstration of the techniques taught in the course material of the **Secure and Private AI Challenge**, hosted by Udacity and sponsored by Facebook (May - August, 2019) and as a entry of several members of the Latin American study group to the *Project Showcase* event in the frame of the previous mentioned challenge.
+This short project serves as a demonstration of the techniques taught in the course material of the **Secure and Private AI Challenge**, hosted by Udacity and sponsored by Facebook (May - August, 2019) and as an entry of several members of the Latin American study group to the *Project Showcase* event in the frame of the previous mentioned challenge.
 
 ![Showcase_Udacity](img/udacity_showcase.png)
 
-The course material gives an introduction of Deep Learning (DL) techniques using *PyTorch* and explores a relatively new framework designed for privacy preserving deep learning: *PySyft* ([Ryffel et. al, 2018](https://arxiv.org/abs/1811.04017)).
+The course material gives an introduction of Deep Learning (DL) techniques using *[PyTorch](https://pytorch.org)* and explores a relatively new framework designed for privacy preserving deep learning: *PySyft* ([Ryffel et. al, 2018](https://arxiv.org/abs/1811.04017)).
 
 The choice of a dataset to work on is not a trivial task, as there is a great amount of publicly available data to work on and we had the freedom to choose any dataset to make a 'showcase' project. We selected a [Pressure Map Dataset for In-bed Posture Classification](https://physionet.org/content/pmd/1.0.0/). This dataset is the product of a study conducted in two separate experimental sessions from 13 participants in various sleeping postures using several commercial pressure mats ([Pouyan et. al, 2017](https://ieeexplore.ieee.org/document/7897206/)). We saw the following advantages by choosing this dataset:
 
 + A relevant dataset in the medical sector, as monitoring in-bed postures is relevant to both prevent any deterioration of the skin of patients who are unable to move frequently (by detecting when patients stay in the same position for a long time), as well as a way of analyzing sleep quality of patients ([Pouyan et. al, 2017](https://ieeexplore.ieee.org/document/7897206/)).
 
-+ A 'small' size (~107 MB) dataset that allowed us to apply the course content efficiently, due to the time expected time of realization of the project (~3 weeks, including planning).
++ A 'small' size (~107 MB) dataset that allowed us to apply the course content efficiently, due to the expected time of realization of the project (~3 weeks, including planning).
 
 +  A rich (in terms of the amount of subjects who participated in the data collection and the fact that more than one pressure mat was used for data collection) dataset that allowed us to simulate real use-case scenarios using privacy preserving methods learned in the course.
 
-Additionally, we use this project as a **proof of concept** to exemplify a potential health care scenario, where Deep Learning (DL) is a potential solution for many problems in that area, but at the same times demands that any DL method ensures the privacy of the patients. While [Pouyan et. al, 2017](https://ieeexplore.ieee.org/document/7897206/) described potential applications for the type of data we are using, pressure readings on a mat can also lead to obtain sensitive information (for example an estimation of the body mass, corpulence and sleep habits) and it is mandatory for hospitals to ensure that the data remains private and that no external attacker can access to it.
+Additionally, we use this project as a **proof of concept** to exemplify a potential health care scenario, where Deep Learning (DL) is a potential solution for many problems in that area, but at the same time demands that any DL method ensures the privacy of the patients. While [Pouyan et. al, 2017](https://ieeexplore.ieee.org/document/7897206/) described potential applications for the type of data we are using, pressure readings on a mat can also lead to obtain sensitive information (for example an estimation of the body mass, corpulence and sleep habits) and it is mandatory for hospitals to ensure that the data remains private and that no external attacker can access to it.
 
 ## Downloading the dataset
 
@@ -46,7 +46,7 @@ Nonetheless, traditional methods to ensure privacy (e.g., data anonymization) as
 
 These results, among many others, have lead to the development of privacy-preserving techniques when learning on data such as *Differential Privacy* and *Federated Learning*. These techniques aim to assure the integrity of the model and data, guaranteeing in this way a degree of safety for the data owners and users.
 
-These techniques add several layers of privacy to the data and model. Hence, by applying them we can safely train and deploy the models, without compromising the user privacy. In this project, we show how to apply some of these techniques, namely, P. Beginning from the raw state of the data, were we perform an EDA. Then, we elaborate our first model, where no private techniques were added. Next, we show how Federated Learning, Private Aggregation of Teacher Ensembles (PATE) and encrypted federated learning.
+These techniques add several layers of privacy to the data and model. Hence, by applying them we can safely train and deploy the models, without compromising the user privacy. In this project, we show how to apply some of these techniques, namely, P. Beginning from the raw state of the data, were we perform an explorative data analysis. Then, we propose a model to classify the images, where no private techniques were added. Next, we show how privacy can be guaranteed via a learning strategy called Private Aggregation of Teacher Ensembles (PATE). Finally, we use encrypted federated learning to show the potential of building a model on a simulated hospital scenario, where the encryption techniques ensure that no third parties can see the raw data of the sensor measurements.
 
 ## Content
 
