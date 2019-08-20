@@ -80,3 +80,15 @@ In this section we implement a training strategy that ensures privacy, called PA
 Federated Learning is a recent approach to machine learning on distributed datasets. This technique, proposed by McMahan et al.(2016) on the paper [Federated Optimization: Distributed Machine Learning for On-Device Intelligence](https://arxiv.org/pdf/1610.02527.pdf), allows to train a model without the need of retrieving the data from its original location. Federated Learning “improves privacy and security risks by limiting the attack surface to only the device, rather than the device and the cloud” (McMahan et al. 2016). Additionally, it allows companies to develop AI products while staying in compliance with GDPR [(Yang et al. 2019)](https://arxiv.org/pdf/1902.04885).
 
 In this section we use the dataset to simulate a scenario in which all subjects contain their data inside their own devices. By using Encrypted Federated Learning, we are able to train a global model by doing Private Model Averaging, without the need to retrieve the private data from the subjects.
+
+## Library versions
+
+We did this project using Python version 3.6.8. Here we list the most important libraries that we used:
+
+| Library  | Version |
+|----------|---------|
+| pytorch  | 1.1.0   |
+| numpy    | 1.16.4  |
+| matplotlib | 3.1.0 | 
+| torchvision | 0.3.0 |
+| syft | 0.1.23 |
